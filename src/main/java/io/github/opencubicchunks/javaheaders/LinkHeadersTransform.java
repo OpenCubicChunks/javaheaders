@@ -1,6 +1,6 @@
 package io.github.opencubicchunks.javaheaders;
 
-import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.gradle.api.artifacts.transform.InputArtifact;
 import org.gradle.api.artifacts.transform.TransformAction;
@@ -14,8 +14,8 @@ import org.gradle.api.tasks.PathSensitivity;
 
 public abstract class LinkHeadersTransform implements TransformAction<LinkHeadersTransform.Parameters> {
     interface Parameters extends TransformParameters {
-        @Input Set<String> getTargetJarNames();
-        void setTargetJarNames(Set<String> targetJarNames);
+        @Input String getAcceptedJars();
+        void setAcceptedJars(String acceptedJars);
 
         @Input long getDebug();
         void setDebug(long value);
@@ -29,9 +29,9 @@ public abstract class LinkHeadersTransform implements TransformAction<LinkHeader
     public void transform(TransformOutputs outputs) {
         String fileName = getInputArtifact().get().getAsFile().getName();
 
-        Set<String> targetJarNames = getParameters().getTargetJarNames();
+        Pattern acceptedJars = Pattern.compile(getParameters().getAcceptedJars());
 
-        if (targetJarNames.contains(fileName)) {
+        if (acceptedJars.matcher(fileName).matches()) {
             JavaHeaders.LOGGER.info(String.format("found %s\n", fileName));
 
             String fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."));

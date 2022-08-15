@@ -2,8 +2,6 @@ package io.github.opencubicchunks.javaheaders;
 
 import io.github.opencubicchunks.javaheaders.LinkHeadersTransform.Parameters;
 
-import java.util.Set;
-
 public class LinkHeadersExtension {
     private final Parameters parameters;
 
@@ -11,8 +9,8 @@ public class LinkHeadersExtension {
         this.parameters = parameters;
     }
 
-    public void setTargetJarNames(Set<String> targetJarNames) {
-        this.parameters.setTargetJarNames(targetJarNames);
+    public void setAcceptedJars(String acceptedJars) {
+        this.parameters.setAcceptedJars(acceptedJars);
     }
 
     public void setDebug(boolean value) {
