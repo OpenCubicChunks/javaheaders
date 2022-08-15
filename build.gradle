@@ -1,19 +1,24 @@
 plugins {
     id 'java-gradle-plugin'
     id 'com.gradle.plugin-publish' version '1.0.0'
-    id 'maven-publish'
 }
 
 group 'io.github.opencubicchunks'
 archivesBaseName = 'javaheaders'
 version '1.0'
 
-gradlePlugin {
-    website = ''
-    vcsUrl = '<uri to project source repository>'
+pluginBundle {
+    website = 'https://github.com/OpenCubicChunks/javaheaders'
+    vcsUrl = 'https://github.com/OpenCubicChunks/javaheaders'
+    tags = ['java']
+}
 
+
+gradlePlugin {
     plugins {
         javaHeadersPlugin {
+            displayName = "Java Headers"
+            description = "Compile time transformation of dependencies using C-style headers syntax"
             id = 'io.github.opencubicchunks.javaheaders'
             implementationClass = 'io.github.opencubicchunks.javaheaders.JavaHeaders'
         }
@@ -42,15 +47,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            groupId = project.group
-//            artifactId = archivesBaseName
-//            version = project.version
-//
-//            from components.java
-//        }
-//    }
-//}
