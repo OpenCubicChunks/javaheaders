@@ -1,0 +1,56 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'maven-publish'
+}
+
+group 'io.github.opencubicchunks'
+archivesBaseName = 'javaheaders'
+version '1.0'
+
+gradlePlugin {
+    website = ''
+    vcsUrl = '<uri to project source repository>'
+
+    plugins {
+        javaHeadersPlugin {
+            id = 'io.github.opencubicchunks.javaheaders'
+            implementationClass = 'io.github.opencubicchunks.javaheaders.JavaHeaders'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io"
+    }
+}
+
+dependencies {
+    implementation 'com.github.OpenCubicChunks:dasm:1ceaf6f68d'
+    implementation 'org.ow2.asm:asm:9.3'
+    implementation 'org.ow2.asm:asm-tree:9.1'
+    implementation 'org.ow2.asm:asm-util:9.1'
+    implementation 'org.ow2.asm:asm-commons:9.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = project.group
+//            artifactId = archivesBaseName
+//            version = project.version
+//
+//            from components.java
+//        }
+//    }
+//}
