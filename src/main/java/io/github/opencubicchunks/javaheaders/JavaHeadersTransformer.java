@@ -92,9 +92,9 @@ public class JavaHeadersTransformer {
             classNodes.parallelStream().forEach(classNode -> customClassWriter.transformClass(classNode).ifPresent(outputClassNodes::add));
 
             saveAsJar(outputClassNodes, coreJar, outputCoreJar);
-            System.out.printf("Writing jar %s\n", outputCoreJar);
+            JavaHeaders.LOGGER.info(String.format("Writing jar %s\n", outputCoreJar));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 

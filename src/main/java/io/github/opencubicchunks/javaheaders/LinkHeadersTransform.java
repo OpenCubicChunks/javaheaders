@@ -31,15 +31,14 @@ public abstract class LinkHeadersTransform implements TransformAction<LinkHeader
 
         Set<String> targetJarNames = getParameters().getTargetJarNames();
 
-        System.out.println(fileName);
         if (targetJarNames.contains(fileName)) {
-            System.out.printf("found %s\n", fileName);
+            JavaHeaders.LOGGER.info(String.format("found %s\n", fileName));
 
             String fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."));
             String outputFileName = fileNameNoExt + "-headerReplacement.jar";
             JavaHeadersTransformer.transformCoreLibrary(getInputArtifact().get().getAsFile(), outputs.file(outputFileName));
 
-            System.out.printf("transformed %s\n", outputFileName);
+            JavaHeaders.LOGGER.info(String.format("transformed %s\n", outputFileName));
             return;
         }
         outputs.file(getInputArtifact());

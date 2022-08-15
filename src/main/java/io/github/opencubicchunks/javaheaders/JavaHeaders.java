@@ -7,8 +7,12 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.attributes.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaHeaders implements Plugin<Project> {
+    public static final Logger LOGGER = LoggerFactory.getLogger("");
+
     @Override
     public void apply(Project project) {
         DependencyHandler dependencies = project.getDependencies();
