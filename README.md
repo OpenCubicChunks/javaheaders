@@ -44,6 +44,15 @@ public interface Bar() {
 
 Within its `build.gradle` `A` then applies the `javaHeaders` plugin, and defines its parameters.
 ```groovy
+buildscript {
+    repositories {
+    }
+    dependencies {
+        classpath 'io.github.opencubicchunks:javaheaders:1.2.2'
+        classpath 'com.google.code.gson:gson:2.8.5'
+    }
+}
+
 apply plugin: 'io.github.opencubicchunks.javaheaders'
 
 linkHeadersConfig {
