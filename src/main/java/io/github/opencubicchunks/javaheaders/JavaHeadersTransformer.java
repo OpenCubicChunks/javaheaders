@@ -62,17 +62,20 @@ public class JavaHeadersTransformer {
             config.implementations.forEach((dstClass, headers) -> {
                 for (String header : headers) {
                     headersImplemented.add(header);
-                    redirectSet.addRedirect(new TypeRedirect(dstClass, header));
+                    redirectSet.addRedirect(new TypeRedirect(header.replace(".", "/"), dstClass.replace(".", "/")));
                 }
             });
 
-            for (ClassNode classNode : classNodes) {
+            for (Iterator<ClassNode> iterator = classNodes.iterator(); iterator.hasNext(); ) {
+                ClassNode classNode = iterator.next();
+
                 if (classNode.visibleAnnotations == null) {
                     continue;
                 }
 
                 for (AnnotationNode visibleAnnotation : classNode.visibleAnnotations) {
                     if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/Header;")) {
+                        iterator.remove(); // remove and header files from the jar
                         String headerClass = classNode.name.replace("/", ".");
                         if (!headersImplemented.contains(headerClass)) {
                             System.err.printf("Header %s is missing an implementation%n\n", headerClass);
