@@ -1,4 +1,5 @@
 # Java Headers
+#### Get [javaheaders-api](https://github.com/OpenCubicChunks/javaheaders-api)
 
 This plugin implemenents 'API inversion'
 
@@ -8,9 +9,17 @@ The API publisher implements the API provided by the consumer
 
 ![image](https://user-images.githubusercontent.com/16853282/184933210-84762efa-96a1-4456-9c3c-9210a0fed5f6.png)
 
+## Why would I ever use this?
+
+The use-case of this is where a project has a dependency which it does not control, and which it wants to support multiple versions of.
+
+For example [the CubicChunks2 project](https://github.com/OpenCubicChunks/CubicChunks2) depends on Minecraft, and wants to support as many versions as possible.
+
+It has a `CubicChunksCore` (Core) subproject which is entirely separated from Minecraft. Core defines an API it expects to work, which CubicChunks2 implements for each Minecraft version it supports.
+
 ## Example case: project `A` depends on project `B`
 
-`B` defines the API it requires using the `io.github.opencubicchunks.javaheaders.api.Header` annotation like so: (`B` may define as many such classes 
+`B` defines the API it requires using the `io.github.opencubicchunks.javaheaders.api.Header` annotation (from [javaheaders-api](https://github.com/OpenCubicChunks/javaheaders)) like so: (`B` may define as many such classes
 or interfaces as it likes)
 ```java
 @Header
