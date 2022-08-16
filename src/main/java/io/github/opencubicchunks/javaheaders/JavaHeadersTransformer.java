@@ -69,7 +69,7 @@ public class JavaHeadersTransformer {
                 }
 
                 for (AnnotationNode visibleAnnotation : classNode.visibleAnnotations) {
-                    if (visibleAnnotation.desc.contains("DeclaresClass")) {
+                    if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/DeclaresClass;")) {
                         List<Object> values = visibleAnnotation.values;
                         assert (values.size() & 1) == 0;
                         for (int i = 0; i < values.size(); i+=2) {

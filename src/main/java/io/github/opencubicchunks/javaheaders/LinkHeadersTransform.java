@@ -12,6 +12,8 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 
+import static io.github.opencubicchunks.javaheaders.JavaHeaders.LOGGER;
+
 public abstract class LinkHeadersTransform implements TransformAction<LinkHeadersTransform.Parameters> {
     interface Parameters extends TransformParameters {
         @Input String getAcceptedJars();
@@ -32,14 +34,16 @@ public abstract class LinkHeadersTransform implements TransformAction<LinkHeader
         Pattern acceptedJars = Pattern.compile(getParameters().getAcceptedJars());
 
         if (acceptedJars.matcher(fileName).matches()) {
-            JavaHeaders.LOGGER.info(String.format("found %s\n", fileName));
+            LOGGER.warn(String.format("found %s", fileName));
 
             String fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."));
             String outputFileName = fileNameNoExt + "-headerReplacement.jar";
             JavaHeadersTransformer.transformCoreLibrary(getInputArtifact().get().getAsFile(), outputs.file(outputFileName));
 
-            JavaHeaders.LOGGER.info(String.format("transformed %s\n", outputFileName));
+            LOGGER.warn(String.format("transformed %s", outputFileName));
             return;
+        } else {
+            LOGGER.info(String.format("Rejected jar %s", fileName));
         }
         outputs.file(getInputArtifact());
     }
