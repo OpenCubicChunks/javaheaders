@@ -1,15 +1,11 @@
 package io.github.opencubicchunks.javaheaders;
 
+import static io.github.opencubicchunks.javaheaders.JavaHeaders.LOGGER;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -22,6 +18,7 @@ import io.github.opencubicchunks.dasm.RedirectsParser.ClassTarget;
 import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet;
 import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet.TypeRedirect;
 import io.github.opencubicchunks.dasm.Transformer;
+import io.github.opencubicchunks.javaheaders.exceptions.HeaderNotImplementedException;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -55,33 +52,31 @@ class CustomClassWriter {
 }
 
 public class JavaHeadersTransformer {
-    public static void transformCoreLibrary(File coreJar, File outputCoreJar) {
+    public static void transformCoreLibrary(Config config, File coreJar, File outputCoreJar) {
         try {
             List<ClassNode> classNodes = loadClasses(coreJar);
             List<ClassNode> outputClassNodes = new ArrayList<>();
 
-            // Scans through all class nodes and looks for @DeclaresClass
-            // adds type redirects from the class node to the specified DeclaresClass#value
+            Set<String> headersImplemented = new HashSet<>(); // headers in the config file the dependent project has declared it implements
             RedirectSet redirectSet = new RedirectSet("");
+            config.implementations.forEach((dstClass, headers) -> {
+                for (String header : headers) {
+                    headersImplemented.add(header);
+                    redirectSet.addRedirect(new TypeRedirect(dstClass, header));
+                }
+            });
+
             for (ClassNode classNode : classNodes) {
                 if (classNode.visibleAnnotations == null) {
                     continue;
                 }
 
                 for (AnnotationNode visibleAnnotation : classNode.visibleAnnotations) {
-                    if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/DeclaresClass;")) {
-                        List<Object> values = visibleAnnotation.values;
-                        assert (values.size() & 1) == 0;
-                        for (int i = 0; i < values.size(); i+=2) {
-                            String key = (String) values.get(i);
-                            Object value = values.get(i+1);
-
-                            if (key.equals("value")) {
-                                if (value instanceof String) {
-                                    String stringValue = (String) value;
-                                    redirectSet.addRedirect(new TypeRedirect(classNode.name.replace("/", "."), stringValue.replace(".", "/")));
-                                }
-                            }
+                    if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/Header;")) {
+                        String headerClass = classNode.name.replace("/", ".");
+                        if (!headersImplemented.contains(headerClass)) {
+                            System.err.printf("Header %s is missing an implementation%n\n", headerClass);
+                            throw new HeaderNotImplementedException(String.format("Header %s is missing an implementation", headerClass));
                         }
                     }
                 }
