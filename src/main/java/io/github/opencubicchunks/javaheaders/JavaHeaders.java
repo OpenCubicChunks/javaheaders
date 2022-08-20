@@ -20,11 +20,11 @@ public class JavaHeaders implements Plugin<Project> {
         Attribute<Boolean> javaHeadersLinked = Attribute.of("javaHeadersLinked", Boolean.class);
 
         ConfigurationContainer configurations = project.getConfigurations();
-        for (Configuration configuration : configurations) {
-            if (configuration.isCanBeResolved()) {
-                configuration.getAttributes().attribute(javaHeadersLinked, true);
+        configurations.all((config) -> {
+            if (config.isCanBeResolved()) {
+                config.getAttributes().attribute(javaHeadersLinked, true);
             }
-        }
+        });
 
         dependencies.getAttributesSchema().attribute(javaHeadersLinked);
         // set all jar dependencies to default to javaHeadersLinked false

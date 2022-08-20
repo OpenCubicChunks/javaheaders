@@ -19,6 +19,7 @@ import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet;
 import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet.TypeRedirect;
 import io.github.opencubicchunks.dasm.Transformer;
 import io.github.opencubicchunks.javaheaders.exceptions.HeaderNotImplementedException;
+import org.gradle.api.GradleException;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -29,7 +30,7 @@ class CustomClassWriter {
 
     private final RedirectSet redirectSet;
 
-    public CustomClassWriter(RedirectSet redirectSet) throws IOException {
+    public CustomClassWriter(RedirectSet redirectSet) {
         this.redirectSet = redirectSet;
     }
 
@@ -53,46 +54,53 @@ class CustomClassWriter {
 
 public class JavaHeadersTransformer {
     public static void transformCoreLibrary(Config config, File coreJar, File outputCoreJar) {
+        List<ClassNode> classNodes;
         try {
-            List<ClassNode> classNodes = loadClasses(coreJar);
-            List<ClassNode> outputClassNodes = new ArrayList<>();
+            classNodes = loadClasses(coreJar);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            throw new GradleException(String.format("Failed to load classes for %s", coreJar), e);
+        }
+        List<ClassNode> outputClassNodes = new ArrayList<>();
 
-            Set<String> headersImplemented = new HashSet<>(); // headers in the config file the dependent project has declared it implements
-            RedirectSet redirectSet = new RedirectSet("");
-            config.implementations.forEach((dstClass, headers) -> {
-                for (String header : headers) {
-                    headersImplemented.add(header);
-                    redirectSet.addRedirect(new TypeRedirect(header.replace(".", "/"), dstClass.replace(".", "/")));
-                }
-            });
+        Set<String> headersImplemented = new HashSet<>(); // headers in the config file the dependent project has declared it implements
+        RedirectSet redirectSet = new RedirectSet("");
+        config.implementations.forEach((dstClass, headers) -> {
+            for (String header : headers) {
+                headersImplemented.add(header);
+                redirectSet.addRedirect(new TypeRedirect(header.replace(".", "/"), dstClass.replace(".", "/")));
+            }
+        });
 
-            for (Iterator<ClassNode> iterator = classNodes.iterator(); iterator.hasNext(); ) {
-                ClassNode classNode = iterator.next();
+        for (Iterator<ClassNode> iterator = classNodes.iterator(); iterator.hasNext(); ) {
+            ClassNode classNode = iterator.next();
 
-                if (classNode.visibleAnnotations == null) {
-                    continue;
-                }
+            if (classNode.visibleAnnotations == null) {
+                continue;
+            }
 
-                for (AnnotationNode visibleAnnotation : classNode.visibleAnnotations) {
-                    if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/Header;")) {
-                        iterator.remove(); // remove and header files from the jar
-                        String headerClass = classNode.name.replace("/", ".");
-                        if (!headersImplemented.contains(headerClass)) {
-                            System.err.printf("Header %s is missing an implementation%n\n", headerClass);
-                            throw new HeaderNotImplementedException(String.format("Header %s is missing an implementation", headerClass));
-                        }
+            for (AnnotationNode visibleAnnotation : classNode.visibleAnnotations) {
+                if (visibleAnnotation.desc.contains("Lio/github/opencubicchunks/javaheaders/api/Header;")) {
+                    iterator.remove(); // remove and header files from the jar
+                    String headerClass = classNode.name.replace("/", ".");
+                    if (!headersImplemented.contains(headerClass)) {
+                        System.err.printf("Header %s is missing an implementation%n\n", headerClass);
+                        throw new HeaderNotImplementedException(String.format("Header %s is missing an implementation", headerClass));
                     }
                 }
             }
+        }
 
-            // transformation
-            CustomClassWriter customClassWriter = new CustomClassWriter(redirectSet);
-            classNodes.parallelStream().forEach(classNode -> customClassWriter.transformClass(classNode).ifPresent(outputClassNodes::add));
+        // transformation
+        CustomClassWriter customClassWriter = new CustomClassWriter(redirectSet);
+        classNodes.parallelStream().forEach(classNode -> customClassWriter.transformClass(classNode).ifPresent(outputClassNodes::add));
 
+        try {
             saveAsJar(outputClassNodes, coreJar, outputCoreJar);
             JavaHeaders.LOGGER.info(String.format("Writing jar %s\n", outputCoreJar));
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            e.printStackTrace(System.err);
+            throw new GradleException(String.format("Failed to write jar for %s", outputCoreJar), e);
         }
     }
 
@@ -138,7 +146,7 @@ public class JavaHeadersTransformer {
      *
      * All non-class entries from the specified input jar are also written to the output jar
      */
-    static void saveAsJar(List<ClassNode> classNodes, File inputJar, File outputJar) {
+    static void saveAsJar(List<ClassNode> classNodes, File inputJar, File outputJar) throws IOException {
         try (JarOutputStream outputStream = new JarOutputStream(Files.newOutputStream(outputJar.toPath()))) {
             Map<String, byte[]> nonClassEntries = loadNonClasses(inputJar);
 
@@ -161,8 +169,6 @@ public class JavaHeadersTransformer {
                 outputStream.write(bytes);
                 outputStream.closeEntry();
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
     }
 
