@@ -36,7 +36,7 @@ public class JavaHeaders implements Plugin<Project> {
 
             Parameters parameters = transformSpec.getParameters();
             LinkHeadersExtension extension = new LinkHeadersExtension(parameters);
-            project.getExtensions().add("linkHeadersConfig", extension);
+            project.getExtensions().add("javaHeaders", extension);
         });
     }
 }
