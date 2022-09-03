@@ -163,8 +163,6 @@ public class JavaHeadersTransformer {
                 classNode.accept(writer);
                 byte[] bytes = writer.toByteArray();
 
-                outputStream.putNextEntry(new ZipEntry(classNode.name));
-
                 outputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
                 outputStream.write(bytes);
                 outputStream.closeEntry();
