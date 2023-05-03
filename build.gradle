@@ -5,7 +5,7 @@ plugins {
 
 group 'io.github.opencubicchunks'
 archivesBaseName = 'javaheaders'
-version '1.2.5'
+version '1.2.6'
 
 pluginBundle {
     website = 'https://github.com/OpenCubicChunks/javaheaders'
@@ -25,6 +25,7 @@ gradlePlugin {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         name = "JitPack"
@@ -33,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.OpenCubicChunks:dasm:e54200b754'
+    implementation 'com.github.OpenCubicChunks:dasm:990faab43e'
 
     implementation 'org.ow2.asm:asm:9.3'
     implementation 'org.ow2.asm:asm-tree:9.1'

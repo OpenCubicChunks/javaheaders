@@ -1,6 +1,5 @@
 package io.github.opencubicchunks.javaheaders;
 
-import static io.github.opencubicchunks.javaheaders.JavaHeaders.LOGGER;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.io.*;
@@ -16,8 +15,8 @@ import java.util.zip.ZipEntry;
 import io.github.opencubicchunks.dasm.MappingsProvider;
 import io.github.opencubicchunks.dasm.RedirectsParser.ClassTarget;
 import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet;
-import io.github.opencubicchunks.dasm.RedirectsParser.RedirectSet.TypeRedirect;
 import io.github.opencubicchunks.dasm.Transformer;
+import io.github.opencubicchunks.dasm.TypeRedirect;
 import io.github.opencubicchunks.javaheaders.exceptions.HeaderNotImplementedException;
 import org.gradle.api.GradleException;
 import org.objectweb.asm.ClassReader;
