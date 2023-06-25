@@ -5,7 +5,7 @@ plugins {
 
 group 'io.github.opencubicchunks'
 archivesBaseName = 'javaheaders'
-version '1.2.6'
+version '1.2.7'
 
 pluginBundle {
     website = 'https://github.com/OpenCubicChunks/javaheaders'
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.OpenCubicChunks:dasm:990faab43e'
+    implementation 'com.github.OpenCubicChunks:dasm:9709b98'
 
     implementation 'org.ow2.asm:asm:9.3'
     implementation 'org.ow2.asm:asm-tree:9.1'
