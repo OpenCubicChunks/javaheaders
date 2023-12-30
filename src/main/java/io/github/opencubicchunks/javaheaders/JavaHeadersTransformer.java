@@ -191,7 +191,7 @@ public class JavaHeadersTransformer {
     }
 
     private static Map<String, byte[]> loadNonClasses(File jarFile) throws IOException {
-        Map<String, byte[]> classes = new HashMap<>();
+        Map<String, byte[]> classes = new LinkedHashMap<>();
         JarFile jar = new JarFile(jarFile);
         Stream<JarEntry> str = jar.stream();
         str.forEach(z -> readNonJars(jar, z, classes));
